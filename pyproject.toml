@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "chatgpt-retrieval-plugin-milvus-transformer"
+version = "0.1.0"
+description = ""
+authors = ["marcelo <mramaciel@gmail.com>"]
+readme = "README.md"
+packages = [{include = "server"}] 
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.92.0"
+uvicorn = "^0.20.0"
+python-dotenv = "^0.21.1"
+pydantic = "^1.10.5"
+numpy = "^1.24.2"
+pymilvus = "^2.2.2"
+loguru = "^0.7.0"
+torch = "^2.0.1"
+sentence-transformers = "^2.2.2"
+langchain = "^0.0.302"
+
+[tool.poetry.scripts]
+start = "server.main:start"
+dev = "local_server.main:start"
+
+[tool.poetry.group.dev.dependencies] #do I need this to run in my localhost?
+httpx = "^0.23.3"
+pytest = "^7.2.1"
+pytest-cov = "^4.0.0"
+pytest-asyncio = "^0.20.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
+]
+asyncio_mode="auto"
