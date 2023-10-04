@@ -1,0 +1,314 @@
+openapi: 3.0.2
+info:
+  title: QGR Memory GPT Plugin
+  description: A plugin to allow GPT to access QGR information and to save conversations. Empowering Research.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3333
+paths:
+  /upsert:
+    post:
+      summary: Upsert
+      description: 'Save chat information. Accepts an array of documents with text:'
+      operationId: upsert_upsert_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpsertResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /query:
+    post:
+      summary: Query Main
+      operationId: query_main_query_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /delete/{document_ids}:
+    delete:
+      summary: Delete
+      operationId: delete_delete__document_ids__delete
+      parameters:
+        - required: true
+          schema:
+            title: Document Ids
+            type: string
+          name: document_ids
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    DeleteResponse:
+      title: DeleteResponse
+      required:
+        - success
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+    Document:
+      title: Document
+      required:
+        - text
+      type: object
+      properties:
+        text:
+          title: Text
+          type: string
+        partition:
+          $ref: '#/components/schemas/Partition'
+        metadata:
+          $ref: '#/components/schemas/DocumentMetadata'
+    DocumentChunkMetadata:
+      title: DocumentChunkMetadata
+      type: object
+      properties:
+        created_at:
+          title: Created At
+          type: string
+        authors:
+          title: Authors
+          type: string
+        title:
+          title: Title
+          type: string
+        abstract:
+          title: Abstract
+          type: string
+        keywords:
+          title: Keywords
+          type: string
+        category:
+          title: Category
+          type: string
+        document_id:
+          title: Document Id
+          type: string
+    DocumentChunkWithScore:
+      title: DocumentChunkWithScore
+      required:
+        - text
+        - score
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        text:
+          title: Text
+          type: string
+        partition:
+          $ref: '#/components/schemas/Partition'
+        metadata:
+          $ref: '#/components/schemas/DocumentChunkMetadata'
+        embedding:
+          title: Embedding
+          type: array
+          items:
+            type: number
+        score:
+          title: Score
+          type: number
+    DocumentMetadata:
+      title: DocumentMetadata
+      type: object
+      properties:
+        created_at:
+          title: Created At
+          type: string
+        authors:
+          title: Authors
+          type: string
+        title:
+          title: Title
+          type: string
+        abstract:
+          title: Abstract
+          type: string
+        keywords:
+          title: Keywords
+          type: string
+        category:
+          title: Category
+          type: string
+    DocumentMetadataFilter:
+      title: DocumentMetadataFilter
+      type: object
+      properties:
+        document_id:
+          title: Document Id
+          type: string
+        authors:
+          title: Authors
+          type: string
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+    Partition:
+      title: Partition
+      enum:
+        - chats
+        - mypapers
+        - papers
+        - notes
+        - books
+        - others
+      type: string
+      description: An enumeration.
+    Query:
+      title: Query
+      required:
+        - query
+      type: object
+      properties:
+        query:
+          title: Query
+          type: string
+        filter:
+          $ref: '#/components/schemas/DocumentMetadataFilter'
+        top_k:
+          title: Top K
+          type: integer
+          default: 5
+        searchprecision:
+          $ref: '#/components/schemas/SearchPrecision'
+        partition:
+          $ref: '#/components/schemas/Partition'
+    QueryRequest:
+      title: QueryRequest
+      required:
+        - queries
+      type: object
+      properties:
+        queries:
+          title: Queries
+          type: array
+          items:
+            $ref: '#/components/schemas/Query'
+    QueryResponse:
+      title: QueryResponse
+      required:
+        - results
+      type: object
+      properties:
+        results:
+          title: Results
+          type: array
+          items:
+            $ref: '#/components/schemas/QueryResult'
+    QueryResult:
+      title: QueryResult
+      required:
+        - query
+        - results
+      type: object
+      properties:
+        query:
+          title: Query
+          type: string
+        results:
+          title: Results
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentChunkWithScore'
+    SearchPrecision:
+      title: SearchPrecision
+      enum:
+        - high
+        - medium
+        - low
+      type: string
+      description: An enumeration.
+    UpsertRequest:
+      title: UpsertRequest
+      required:
+        - documents
+      type: object
+      properties:
+        documents:
+          title: Documents
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+    UpsertResponse:
+      title: UpsertResponse
+      required:
+        - document_id
+      type: object
+      properties:
+        document_id:
+          title: Document Id
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: string
+    ValidationError:
+      title: ValidationError
+      required:
+        - loc
+        - msg
+        - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
