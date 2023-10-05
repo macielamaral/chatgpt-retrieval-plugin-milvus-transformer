@@ -19,7 +19,7 @@ Modification of the ChatGPT Retrieval Plugin to utilize embeddings from open mod
 | [`services`](/services)         | Contains utility services for tasks like chunking and embedding.                                 |
 | [`.well-known`](/.well-known)   | Stores the plugin manifest file and OpenAPI schema, which define the plugin configuration and API specification.           |
 
-This README provides detailed information on how to set up, develop, and deploy the ChatGPT Retrieval Plugin.
+This README provides detailed information on the modifications of the ChatGPT Retrieval Plugin.
 
 ## Table of Contents
 
@@ -29,6 +29,7 @@ This README provides detailed information on how to set up, develop, and deploy 
 - [Development](#development)
   - [Milvus](#milvus)
 - [Scripts](#scripts)
+- [Computational Notebooks with More details](#computational-notebooks-with-more-details)
 
 ## Quickstart
 
@@ -120,3 +121,9 @@ Functions Overview:
     extract_and_save_data_from_tei: Processes .tei.xml files from a source directory, extracting data and saving it as .json files in a destination directory.
 
 You can use GROBID (https://github.com/kermitt2/grobid/archive/0.7.3.zip) to automatically extract structured data from scientific PDFs in nested directories. 
+
+## Computational Notebooks with More details
+
+https://github.com/macielamaral/computational_essays/blob/main/Tutorial_Milvus_for_LLM_Memory_Data_Processing.ipynb
+
+https://github.com/macielamaral/computational_essays/blob/main/Tutorial_Scientific_Data_for_LLMs.ipynb
