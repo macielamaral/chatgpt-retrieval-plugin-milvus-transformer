@@ -4,7 +4,7 @@ info:
   description: A plugin to allow GPT to access QGR information and to save conversations. Empowering Research.
   version: 1.0.0
 servers:
-  - url: http://localhost:3333
+  - url: https://your-app-url.com
 paths:
   /upsert:
     post:

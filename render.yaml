@@ -1,0 +1,39 @@
+services:
+  # FastAPI Server
+  - type: web
+    name: qgr_retrieval-plugin-server 
+    region: oregon
+    plan: starter
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars: 
+      - key: DATASTORE
+        value: milvus
+      - key: BEARER_TOKEN
+        generateValue: true 
+      - key: MILVUS_HOST
+        fromService:
+          type: pserv
+          name: milvus
+          property: host
+      - key: MILVUS_PORT
+        value: 19530
+      - key: MILVUS_COLLECTION
+        value: QGRmemory
+      - key: MILVUS_INDEX_PARAMS
+        value: '{"metric_type": "IP", "index_type": "IVF_FLAT", "params": {"nlist": 2048}}'
+      - key: MILVUS_SEARCH_PARAMS
+        value: '{"metric_type": "IP", "param": {"nprobe": 1000}, "round_decimal": -1}'
+
+  # Weaviate vector database
+  - type: pserv
+    name: milvus
+    region: oregon
+    plan: starter
+    env: docker
+    dockerfilePath: ./docker-compose.yml
+    autoDeploy: false
+    disk:
+      name: milvus-data
+      mountPath: /var/lib/milvus
+      sizeGB: 1
