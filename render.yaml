@@ -31,7 +31,7 @@ services:
     region: oregon
     plan: free
     env: docker
-    dockerfilePath: ./docker-compose.yml
+    dockerfilePath: ./milvus.yaml
     autoDeploy: false
     disk:
       name: milvus-data
