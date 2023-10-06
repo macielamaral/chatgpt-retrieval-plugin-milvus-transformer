@@ -29,7 +29,7 @@ services:
   - type: pserv
     name: milvus
     region: oregon
-    plan: free
+    plan: starter
     env: docker
     dockerfilePath: ./milvus.yaml
     autoDeploy: false
