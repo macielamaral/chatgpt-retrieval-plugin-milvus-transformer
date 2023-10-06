@@ -3,7 +3,7 @@ services:
   - type: web
     name: qgr_retrieval-plugin-server 
     region: oregon
-    plan: starter
+    plan: free
     env: docker
     dockerfilePath: ./Dockerfile
     envVars: 
@@ -29,7 +29,7 @@ services:
   - type: pserv
     name: milvus
     region: oregon
-    plan: starter
+    plan: free
     env: docker
     dockerfilePath: ./docker-compose.yml
     autoDeploy: false
