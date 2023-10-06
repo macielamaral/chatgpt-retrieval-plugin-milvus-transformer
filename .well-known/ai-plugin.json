@@ -10,10 +10,10 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://your-app-url.com/.well-known/openapi.yaml",
+    "url": "https://qgr-retrieval-plugin-server.onrender.com/.well-known/openapi.yaml",
     "has_user_authentication": false
   },
-  "logo_url": "http://your-app-url.com/.well-known/logo.png",
+  "logo_url": "https://qgr-retrieval-plugin-server.onrender.com/.well-known/logo.png",
   "contact_email": "mramaciel@gmail.com", 
   "legal_info_url": "mramaciel@gmail.com"
 }
