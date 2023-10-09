@@ -31,7 +31,7 @@ services:
     region: oregon
     plan: starter
     env: docker
-    image: your-username/milvus-render:latest # Change this to your Docker Hub image
+    image: mramaciel/milvus-render:latest
     autoDeploy: false
     disk:
       name: milvus-data
