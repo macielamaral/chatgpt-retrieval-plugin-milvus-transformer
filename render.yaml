@@ -1,7 +1,7 @@
 services:
   # FastAPI Server
   - type: web
-    name: qgr_retrieval-plugin-server 
+    name: qgr-retrieval-plugin 
     region: oregon
     plan: free
     env: docker
@@ -25,15 +25,15 @@ services:
       - key: MILVUS_SEARCH_PARAMS
         value: '{"metric_type": "IP", "param": {"nprobe": 1000}, "round_decimal": -1}'
 
-  # Weaviate vector database
+  # Milvus vector database
   - type: pserv
     name: milvus
     region: oregon
     plan: starter
     env: docker
-    dockerfilePath: ./milvus.yaml
+    image: your-username/milvus-render:latest # Change this to your Docker Hub image
     autoDeploy: false
     disk:
       name: milvus-data
       mountPath: /var/lib/milvus
-      sizeGB: 1
+      sizeGB: 4

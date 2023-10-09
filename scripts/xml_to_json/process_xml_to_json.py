@@ -1,8 +1,11 @@
+# scripts/process_xml_to_json.py
+
 from langchain.document_loaders import TextLoader
 import os
 import re
 import json
 import xml.etree.ElementTree as ET
+import argparse
 
 def recursive_text_extraction(element):
     """ 
@@ -257,3 +260,16 @@ def extract_and_save_data_from_tei(dir_source_path: str, dir_destination_path: s
                     with open(full_destination_path, 'w') as f:
                         json.dump(latex_doc, f)
 
+def main(args):
+    dir_source_path = args.dir_source_path
+    dir_destination_path = args.dir_destination_path
+
+    extract_and_save_data_from_tei(dir_source_path,dir_destination_path)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dir_source_path", default="data/xml/", help="The path to the source directory containing XML files.")
+    parser.add_argument("--dir_destination_path", default="data/json/", help="The path to the destination directory where JSON files will be saved.")
+    
+    args = parser.parse_args()
+    main(args)

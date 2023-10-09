@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any, Union
 import asyncio
 import random
 
@@ -88,3 +88,21 @@ class DataStore(ABC):
         Returns whether the operation was successful.
         """
         return await self._delete(documentIds)
+    
+    async def raw_upsert(
+            self,
+            document: List[List[Any]],
+            partition_name: str
+        ) -> Any:  
+        """
+        Insert data
+        """
+        return await self._raw_upsert(document, partition_name)
+    
+    async def flush(
+            self
+        ) -> Any:  
+        """
+        Flush
+        """
+        return await self._flush()

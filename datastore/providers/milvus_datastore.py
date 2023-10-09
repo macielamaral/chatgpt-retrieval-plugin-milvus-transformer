@@ -4,7 +4,7 @@ import asyncio
 import ast
 
 from loguru import logger
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any, Union
 from pymilvus import (
     Collection,
     connections,
@@ -491,3 +491,24 @@ class MilvusDataStore(DataStore):
         else:
             #logger.error("Failed to delete by ids")
             return False
+
+    async def _raw_upsert(
+        self,
+        document: List[List[Any]],
+        partition_name: str
+    ) -> Any: 
+        """
+        Insert data
+        """
+        result = self.col.insert(data=document, partition_name=partition_name)
+        return result
+
+
+    async def _flush(
+            self
+        ) -> Any:  
+        """
+        Flush
+        """
+        self.col.flush()
+        return True 

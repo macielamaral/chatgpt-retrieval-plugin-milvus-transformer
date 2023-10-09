@@ -224,4 +224,26 @@ def get_document_chunks(documents: List[Document], chunk_token_size: Optional[in
     return document_chunks
 
 
+def convertToVector(sentence, model, length):
+    # Truncate the sentence 
+    sentence = sentence[:length]
+
+    # Generate the sentence embedding using SBERT
+    embedding = model.encode(sentence)
+
+    # Normalize the embeddings
+    embedding = embedding / np.linalg.norm(embedding)
+
+    return embedding.tolist()  
+
+
+
+# Function to load existing processed files
+def load_processed_files(filename):
+    try:
+        with open(filename, 'r') as json_file:
+            return json.load(json_file)
+    except FileNotFoundError:
+        return []
+    
     

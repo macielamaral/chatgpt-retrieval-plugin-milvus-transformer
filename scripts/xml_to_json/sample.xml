@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI>
+	<teiHeader>
+		<fileDesc>
+			<titleStmt>
+				<title>Sample Title</title>
+			</titleStmt>
+			<publicationStmt>
+				<publisher>Sample Publisher</publisher>
+				<date>Sample Date</date>
+			</publicationStmt>
+			<sourceDesc>
+				<analytic>
+					<author>
+						<persName><forename>Sample</forename><surname>Author</surname></persName>
+					</author>
+					<title>Sample Title</title>
+				</analytic>
+			</sourceDesc>
+		</fileDesc>
+	</teiHeader>
+	<text>
+		<body>
+			<div>
+				<head>Sample Section</head>
+				<p>Sample text.</p>
+			</div>
+		</body>
+		<back>
+			<div type="references">
+				<listBibl>
+					<biblStruct>
+						<monogr>
+							<title>Sample Book</title>
+							<author>
+								<persName><forename>Sample</forename><surname>Author</surname></persName>
+							</author>
+							<imprint>
+								<date>Sample Date</date>
+								<publisher>Sample Publisher</publisher>
+							</imprint>
+						</monogr>
+					</biblStruct>
+				</listBibl>
+			</div>
+		</back>
+	</text>
+</TEI>

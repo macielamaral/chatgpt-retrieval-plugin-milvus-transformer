@@ -109,18 +109,16 @@ To include custom metadata fields, edit data models (/models/models.py), and upd
 
 ## Scripts
 
-The `scripts` folder contains a package with functions for XML Data Extraction & Transformation Utilities.
+The `scripts` folder contains two scripts: 
 
-This is a set of utility functions designed to parse, transform, and extract data from XML files, especially those structured according to the Text Encoding Initiative (TEI) guidelines. The utilities cater to various needs, from basic text extraction to advanced metadata processing and LaTeX content conversion.
-Functions Overview:
-
-    recursive_text_extraction: Extracts all textual content from an XML element, including nested child elements.
-    extract_information_from_tei: Processes a TEI-formatted XML string, extracting metadata and content, which is then transformed to LaTeX syntax.
-    slugStrip: Sanitizes a string for use as a URL slug or filename, ensuring adherence to common formatting standards.
-    create_file_name: Converts a title or heading into a sanitized filename, suitable for JSON files.
-    extract_and_save_data_from_tei: Processes .tei.xml files from a source directory, extracting data and saving it as .json files in a destination directory.
+process_xml_to_json.py
+  See scripts/README.md
 
 You can use GROBID (https://github.com/kermitt2/grobid/archive/0.7.3.zip) to automatically extract structured data from scientific PDFs in nested directories. 
+
+process_json.py
+
+  See scripts/README.md
 
 ## Computational Notebooks with More details
 
