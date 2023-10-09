@@ -24,16 +24,3 @@ services:
         value: '{"metric_type": "IP", "index_type": "IVF_FLAT", "params": {"nlist": 2048}}'
       - key: MILVUS_SEARCH_PARAMS
         value: '{"metric_type": "IP", "param": {"nprobe": 1000}, "round_decimal": -1}'
-
-  # Milvus vector database
-  - type: pserv
-    name: milvus
-    region: oregon
-    plan: starter
-    env: docker
-    image: mramaciel/milvus-render:latest
-    autoDeploy: false
-    disk:
-      name: milvus-data
-      mountPath: /var/lib/milvus
-      sizeGB: 4
