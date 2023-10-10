@@ -14,7 +14,7 @@ services:
       - key: MILVUS_HOST
         fromService:
           type: pserv
-          name: milvus
+          name: milvus-service
           property: host
       - key: MILVUS_PORT
         value: 19530
