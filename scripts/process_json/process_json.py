@@ -16,7 +16,7 @@ import asyncio
 
 
 
-async def insert_data_into_milvus(
+async def insert_data_json_into_milvus(
         collection_name,
         partition_name,
         sbert_model_name,
@@ -176,7 +176,7 @@ async def main():
     files_processed_save_max = args.files_processed_save_max
 
     # Call the insert_data_into_milvus function
-    await insert_data_into_milvus(
+    await insert_data_json_into_milvus(
         collection_name,
         partition_name,
         sbert_model_name,
