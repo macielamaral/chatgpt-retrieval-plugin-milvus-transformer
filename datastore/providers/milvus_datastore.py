@@ -44,7 +44,7 @@ MILVUS_CONSISTENCY_LEVEL = os.environ.get("MILVUS_CONSISTENCY_LEVEL")
 #UPSERT_BATCH_SIZE = 100
 OUTPUT_DIM = 384
 EMBEDDING_FIELD = "content_vector"
-MILVUS_COLLECTION_PARTITIONS = ['mypapers', 'papers', 'notes', 'books', 'others', 'chats']
+MILVUS_COLLECTION_PARTITIONS = ['ourpapers', 'papers', 'notes', 'books', 'others', 'chats']
 MILVUS_COLLECTION_PARTITION = "chats"
 
 class Required:

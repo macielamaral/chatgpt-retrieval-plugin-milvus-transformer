@@ -6,7 +6,7 @@ from pydantic import validator
 
 class Partition(str, Enum):
     chats = "chats"
-    mypapers = "mypapers"
+    ourpapers = "ourpapers"
     papers = "papers"
     notes = "notes"
     books = "books"
