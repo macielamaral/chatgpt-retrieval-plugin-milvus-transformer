@@ -1,5 +1,5 @@
 {
-  "schema_version": "v3",
+  "schema_version": "v1",
   "name_for_model": "QGRMemory",
   "name_for_human": "QGR Memory",
   "description_for_model": "Plugin for searching through the user's Milvus vector database within the 'QGRmemory' collection. It includes partitions such as ourpapers, papers, notes, books, others, and chats. This collection encompasses various types of data like papers, emails, notes, and more. Utilize this plugin when a user poses a query that might be located within their personal records, mentions QGRMemory, requests information storage for future reference or to delete documments by document_ids. For querying, use the format: {'queries': [{'query': 'string', 'filter': {'document_id': 'string', 'authors': 'string'}, 'top_k': 5, 'searchprecision': 'high', 'partition': 'chats'}]}. For data storage, employ: {'documents':[{'text': 'string', 'partition': 'chats', 'metadata': {'created_at': 'string', 'authors': 'string', 'title': 'string', 'abstract': 'string', 'keywords': 'string', 'category': 'string'}}]}. .For data deletion, send a DELETE request to /delete/id1,id2,id3 where id1, id2, id3 are the document IDs you wish to delete.",
