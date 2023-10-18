@@ -10,10 +10,10 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://qgr-retrieval-plugin-server.onrender.com/.well-known/openapi.yaml",
+    "url": "https://url/.well-known/openapi.yaml",
     "has_user_authentication": false
   },
-  "logo_url": "https://qgr-retrieval-plugin-server.onrender.com/.well-known/logo.png",
-  "contact_email": "mramaciel@gmail.com", 
-  "legal_info_url": "mramaciel@gmail.com"
+  "logo_url": "https://url/.well-known/logo.png",
+  "contact_email": "@quantumgravityresearch.org", 
+  "legal_info_url": "@quantumgravityresearch.org"
 }
