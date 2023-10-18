@@ -37,25 +37,24 @@ See the original plugin documentation for installation and understand the plugin
 Follow these steps to quickly set up and run the ChatGPT Retrieval Plugin with Milvus and Sentence-Transformer
 
 1. Install Python 3.10, if not already installed. Here an example with ubuntu 20.04:
-  python3 --version
-  sudo apt update
-  sudo apt install -y software-properties-common
-  sudo add-apt-repository ppa:deadsnakes/ppa
-  sudo apt update
-  sudo apt install -y python3.10 python3.10-venv python3.10-dev
-  python3.10 --version
-  cd
-  mkdir venvs
-  python3.10 -m venv ~/venvs/chatgpt_retrieval
-  source ~/venvs/chatgpt_retrieval/bin/activate
-  cd venvs/chatgpt_retrieval/
+
+  `python3 --version`
+  `sudo apt update`
+  `sudo apt install -y software-properties-common`
+  `sudo add-apt-repository ppa:deadsnakes/ppa`
+  `sudo apt update`
+  `sudo apt install -y python3.10 python3.10-venv python3.10-dev`
+  `python3.10 --version`
+  `cd``
+  `mkdir venvs`
+  `python3.10 -m venv ~/venvs/chatgpt_retrieval` 
+  `source ~/venvs/chatgpt_retrieval/bin/activate`
+  `cd venvs/chatgpt_retrieval/`
 2. Clone the repository: `git clone https://github.com/openai/chatgpt-retrieval-plugin-milvus-transformer.git`
 3. Navigate to the cloned repository directory: `cd chatgpt-retrieval-plugin-milvus-transformer`
-4. Install poetry: `pip install poetry`
-5. Create a new virtual environment with Python 3.10: `poetry env use python3.10`
-6. Activate the virtual environment: `poetry shell`
+4. Install poetry: `pip install poetry`, `poetry update`
 7. Install app dependencies: `poetry install`
-8. Create a [bearer token](#general-environment-variables)
+8. Create a bearer token: `openssl rand -base64 32`
 9. Set the required environment variables:
 
    ```
