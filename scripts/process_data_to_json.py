@@ -9,8 +9,7 @@ import json
 from urllib.parse import urlparse
 from grobid_client.grobid_client import GrobidClient
 from xml_to_json.process_xml_to_json import extract_and_save_data_from_tei
-
-
+from datetime import datetime
 
 
 class UnsupportedFileTypeError(Exception):
@@ -154,7 +153,7 @@ def main(input_path_or_url):
             print("New JSON file from latex saved in:", dir_destination_path)
         
         elif file_type == 'text':
-            json_data = text_to_json(input_path_or_url)
+            json_data = text_to_json(input_file, dir_destination_path)
         
         elif file_type == 'email':
             json_data = email_to_json(input_path_or_url)
@@ -171,9 +170,49 @@ def main(input_path_or_url):
 
 
 
-def text_to_json(input_path_or_url):
-    # Convert plain text to JSON
-    pass
+
+def text_to_json(input_file, dir_destination_path):
+    # Read the plain text content from the input file
+    with open(input_file, 'r') as f:
+        text_content = f.read()
+    
+    # Initialize the JSON object
+    json_data = {}
+    
+    # Use the file name as the title
+    json_data['title'] = os.path.splitext(os.path.basename(input_file))[0]
+    
+    # Use the current date as the date
+    json_data['date'] = datetime.now().strftime('%Y-%m-%d')
+    
+    # Assume authors list is empty (since we don't have this metadata in plain text)
+    json_data['authors'] = []
+    
+    # Assume the first paragraph is the abstract
+    paragraphs = text_content.split('\n\n', 1)
+    if paragraphs:
+        json_data['abstract'] = paragraphs[0].strip()
+    
+    # Limit the abstract to 1000 characters
+    json_data['abstract'] = json_data['abstract'][:1000]
+
+    # Include the whole text document, ensuring we escape any characters that need it
+    json_data['latex_doc'] = text_content
+
+    # Create the destination directory if it doesn't exist
+    if not os.path.exists(dir_destination_path):
+        os.makedirs(dir_destination_path)
+    
+    # Generate the JSON file name based on the input text file name
+    json_file_name = os.path.splitext(os.path.basename(input_file))[0] + '.json'
+    json_file_path = os.path.join(dir_destination_path, json_file_name)
+    
+    # Save the JSON data to the destination directory
+    with open(json_file_path, 'w') as f:
+        json.dump(json_data, f, indent=4)
+    
+    return json_file_path
+
 
 def email_to_json(input_path_or_url):
     # Convert email to JSON
