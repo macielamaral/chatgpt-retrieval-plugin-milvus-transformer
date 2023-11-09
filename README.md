@@ -50,7 +50,7 @@ Follow these steps to quickly set up and run the ChatGPT Retrieval Plugin with M
   `python3.10 -m venv ~/venvs/chatgpt_retrieval` 
   `source ~/venvs/chatgpt_retrieval/bin/activate`
   `cd venvs/chatgpt_retrieval/`
-2. Clone the repository: `git clone https://github.com/openai/chatgpt-retrieval-plugin-milvus-transformer.git`
+2. Clone the repository: `git clone https://github.com/macielamaral/chatgpt-retrieval-plugin-milvus-transformer.git`
 3. Navigate to the cloned repository directory: `cd chatgpt-retrieval-plugin-milvus-transformer`
 4. Install poetry: `pip install poetry`, `poetry update`
 7. Install app dependencies: `poetry install`
