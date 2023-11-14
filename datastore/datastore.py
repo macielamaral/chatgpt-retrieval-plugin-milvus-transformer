@@ -10,7 +10,8 @@ from models.models import (
     Query,
     QueryResult,
     QueryWithEmbedding,
-    SearchPrecision
+    SearchPrecision,
+    DocumentDelete
 )
 
 from services.data_processing import get_embeddings
@@ -78,16 +79,16 @@ class DataStore(ABC):
                 r.results = truncate_results(r.results, 1, queries[i].searchprecision)
 
         return response
-    
+
     async def delete(
         self,
-        documentIds: List[str]
+        documents: List[DocumentDelete]
     ) -> bool:
         """
         Removes vectors by documentId
         Returns whether the operation was successful.
         """
-        return await self._delete(documentIds)
+        return await self._delete(documents)
     
     async def raw_upsert(
             self,

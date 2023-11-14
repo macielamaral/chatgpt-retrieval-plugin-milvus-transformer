@@ -196,7 +196,7 @@ components:
       title: Partition
       enum:
         - chats
-        - ourpapers
+        - researches
         - papers
         - notes
         - books

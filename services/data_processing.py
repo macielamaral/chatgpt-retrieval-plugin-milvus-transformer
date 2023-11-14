@@ -39,6 +39,7 @@ from langchain.text_splitter import LatexTextSplitter
 sbert_model = SentenceTransformer('sentence-transformers/multi-qa-MiniLM-L6-cos-v1') 
 
 # default values
+MILVUS_COLLECTION = os.environ.get("MILVUS_COLLECTION") #Default Collection
 CATEGORY = "ChatGPT"
 PARTITION = "chats"
 
@@ -150,6 +151,7 @@ def get_document_chunks(documents: List[Document], chunk_token_size: Optional[in
         category_value = CATEGORY
         content = doc.text
         partition_name = doc.partition or PARTITION
+        collection_name = doc.collection or MILVUS_COLLECTION
 
         if len(date_value) > 1000:
             date_value = clean_description(date_value)
@@ -211,6 +213,7 @@ def get_document_chunks(documents: List[Document], chunk_token_size: Optional[in
             doc_chunk = DocumentChunk(
                 id=f"{doc_id}_{len(doc_chunks)}",
                 text=embeddingElement,
+                collection=collection_name,
                 partition=partition_name,
                 metadata=chunk_metadata,
                 embedding=content_vector_element

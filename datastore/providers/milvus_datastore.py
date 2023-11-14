@@ -27,10 +27,11 @@ from models.models import (
     QueryResult,
     QueryWithEmbedding,
     DocumentChunkWithScore,
+    DocumentDelete
 )
 
 
-MILVUS_COLLECTION = os.environ.get("MILVUS_COLLECTION") or "c" + uuid4().hex
+MILVUS_COLLECTION = os.environ.get("MILVUS_COLLECTION") or "c" + uuid4().hex #Default Collection
 MILVUS_HOST = os.environ.get("MILVUS_HOST") or "localhost"
 MILVUS_PORT = os.environ.get("MILVUS_PORT") or 19530
 MILVUS_USER = os.environ.get("MILVUS_USER")
@@ -44,7 +45,7 @@ MILVUS_CONSISTENCY_LEVEL = os.environ.get("MILVUS_CONSISTENCY_LEVEL")
 #UPSERT_BATCH_SIZE = 100
 OUTPUT_DIM = 384
 EMBEDDING_FIELD = "content_vector"
-MILVUS_COLLECTION_PARTITIONS = ['ourpapers', 'papers', 'notes', 'books', 'others', 'chats']
+MILVUS_COLLECTION_PARTITIONS = ['researches', 'papers', 'notes', 'books', 'others', 'chats', 'codes', 'emails']
 MILVUS_COLLECTION_PARTITION = "chats"
 
 class Required:
@@ -208,6 +209,33 @@ class MilvusDataStore(DataStore):
         except Exception as e:
             logger.error("Failed to create collection '{}', error: {}".format(collection_name, e))
 
+    def _update_collection(self, collection_name):
+        """
+        Switch to the specified collection in Milvus.
+        If the collection does not exist, it could either create a new one or raise an error.
+
+        Args:
+            collection_name (str): The name of the collection to switch to.
+        """
+
+        # Check if the collection exists
+        if utility.has_collection(collection_name, using=self.alias) is False:
+            # Option 1: Create the collection if it doesn't exist
+            # self._create_collection(collection_name)
+
+            # Option 2: Or, raise an error
+            raise ValueError(f"Collection {collection_name} does not exist in Milvus.")
+
+        # Switch the current collection context
+        self.col = Collection(
+                    collection_name, using=self.alias
+                )
+        # Check if the collection is loaded
+        load_state = utility.load_state(collection_name, using=self.alias)
+        if load_state != 'Loaded':
+            # Load the collection
+            self.col.load()
+        
     def _create_index(self):
         # TODO: verify index/search params passed by os.environ
         self.index_params = MILVUS_INDEX_PARAMS or None
@@ -268,6 +296,7 @@ class MilvusDataStore(DataStore):
             
             # The doc id's to return for the upsert
             document_ids_count: Dict[str, Dict[str, str]] = {}
+            
 
             # Prepare data for insertion
             for document_id, chunk_list in document_chunks.items():
@@ -295,6 +324,9 @@ class MilvusDataStore(DataStore):
                         [embeddingElement],
                         [content_vector_element]
                     ]
+                    
+                    # Update the collection context
+                    self._update_collection(chunk.collection or MILVUS_COLLECTION)
 
                     # Insert the data directly
                     insert_result = self.col.insert(data=doc, partition_name=chunk.partition)
@@ -363,7 +395,8 @@ class MilvusDataStore(DataStore):
                 # If no filter fields are set, set filter_expr to None
                 filter_expr = filter_expr if expressions else None
 
-
+                # Update the collection context
+                self._update_collection(query.collection or MILVUS_COLLECTION)
                 
                 # set partition
                 partition_names = None
@@ -454,19 +487,22 @@ class MilvusDataStore(DataStore):
 
     async def _delete(
         self,
-        documentIds: List[str],
+        documents_delete: List[DocumentDelete]
     ) -> bool:
         """Delete the entities based on documentId.
 
         Args:
-            documentIds List[str]: The documentIds to delete. 
+            documentIds List[str]: The DocumentDelete with documentIds to delete and collection. 
         """
 
         delete_count = 0  # Count of total deleted records (chunks)
         try:
-            for document_id_to_search in documentIds:
+            for doc in documents_delete:
+                # Update the collection context
+                self._update_collection(doc.collection or MILVUS_COLLECTION)
+                    
                 # Step 1: Search for the documentId to get the primary key (id)
-                search_results = self.col.query(f"documentId == '{document_id_to_search}'")
+                search_results = self.col.query(f"documentId == '{doc.document_id}'")
 
                 # Step 2: Extract the primary keys from the search results
                 primary_keys_to_delete = [result['id'] for result in search_results]

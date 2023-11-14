@@ -19,7 +19,7 @@ from datastore.factory import get_datastore
 
 from starlette.responses import FileResponse
 
-from models.models import DocumentMetadata, Partition
+from models.models import DocumentMetadata
 
 app = FastAPI()
 
@@ -98,27 +98,23 @@ async def query_main(request: QueryRequest = Body(...)):
         raise HTTPException(status_code=500, detail="Internal Service Error")
 
 
+
 @app.delete(
-    "/delete/{document_ids}",
+    "/delete",
     response_model=DeleteResponse,
 )
 async def delete(
-    document_ids: str,
+    request: DeleteRequest = Body(...),
 ):
-    ids_list = document_ids.split(',')
-    if not ids_list:
-        raise HTTPException(
-            status_code=400,
-            detail="One document_id is required",
-        )
     try:
         success = await datastore.delete(
-            documentIds=ids_list
+            request.documents
         )
         return DeleteResponse(success=success)
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
+
 
 @app.on_event("startup")
 async def startup():

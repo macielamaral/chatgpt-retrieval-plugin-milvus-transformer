@@ -3,6 +3,7 @@ from models.models import (
     DocumentMetadataFilter,
     Query,
     QueryResult,
+    DocumentDelete
 )
 from pydantic import BaseModel
 from typing import List, Dict, Any
@@ -21,7 +22,7 @@ class QueryResponse(BaseModel):
     results: List[QueryResult]
 
 class DeleteRequest(BaseModel):
-    document_ids: List[str]
+    documents: List[DocumentDelete]
 
 class DeleteResponse(BaseModel):
     success: bool
