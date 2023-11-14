@@ -2,6 +2,8 @@ import json
 import os
 import asyncio
 import ast
+from datetime import datetime
+
 
 from loguru import logger
 from typing import Dict, List, Optional, Any, Union
@@ -302,19 +304,30 @@ class MilvusDataStore(DataStore):
             for document_id, chunk_list in document_chunks.items():
                 insert_count = 0
                 for chunk in chunk_list:
-                    documentId_value = document_id
-                    title_value = chunk.metadata.title or "Unknown"
-                    date_value = chunk.metadata.created_at or "Unknown"
-                    author_value = chunk.metadata.authors or "Unknown"
-                    abstract_value = chunk.metadata.abstract or "Unknown"
-                    keywords_value = chunk.metadata.keywords or "Unknown"
-                    category_value = chunk.metadata.category or "Unknown"
+                    # Default values if metadata is None
+                    title_value = "Unknown"
+                    current_date = str(datetime.now().strftime("%Y-%m-%d"))
+                    date_value = current_date
+                    author_value = "Unknown"
+                    abstract_value = "Unknown"
+                    keywords_value = "Unknown"
+                    category_value = "Unknown"
+
+                    # Update the values if metadata is provided
+                    if chunk.metadata is not None:
+                        title_value = chunk.metadata.title or "Unknown"
+                        date_value = chunk.metadata.created_at or current_date
+                        author_value = chunk.metadata.authors or "Unknown"
+                        abstract_value = chunk.metadata.abstract or "Unknown"
+                        keywords_value = chunk.metadata.keywords or "Unknown"
+                        category_value = chunk.metadata.category or "Unknown"
+                        
                     embeddingElement = chunk.text
                     content_vector_element = chunk.embedding
 
 
                     doc = [
-                        [documentId_value],
+                        [document_id],
                         [title_value],
                         [date_value],
                         [author_value],

@@ -21,6 +21,8 @@ import hashlib
 from typing import List
 import numpy as np
 import pandas as pd
+from datetime import datetime
+
 from pymilvus import (
     connections,
     utility,
@@ -143,12 +145,26 @@ def get_document_chunks(documents: List[Document], chunk_token_size: Optional[in
  
     for doc in documents:
         # Extracting the metadata and content from the document
-        date_value = doc.metadata.created_at or "Unknown"
-        keywords_value = doc.metadata.keywords or "Unknown"
-        author_value = doc.metadata.authors or "Unknown"
-        title_value = doc.metadata.title or "Unknown"
-        abstract_value = doc.metadata.abstract or "Unknown"
-        category_value = CATEGORY
+        # Default values if metadata is None
+        title_value = "Unknown"
+        current_date = str(datetime.now().strftime("%Y-%m-%d"))
+        date_value = current_date
+        author_value = "Unknown"
+        abstract_value = "Unknown"
+        keywords_value = "Unknown"
+        category_value = "Unknown"
+
+        # Update the values if metadata is provided
+        if doc.metadata is not None:
+            title_value = doc.metadata.title or "Unknown"
+            date_value = doc.metadata.created_at or current_date
+            author_value = doc.metadata.authors or "Unknown"
+            abstract_value = doc.metadata.abstract or "Unknown"
+            keywords_value = doc.metadata.keywords or "Unknown"
+            category_value = doc.metadata.category or "Unknown"
+            
+            
+       
         content = doc.text
         partition_name = doc.partition or PARTITION
         collection_name = doc.collection or MILVUS_COLLECTION
