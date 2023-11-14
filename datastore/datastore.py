@@ -8,7 +8,7 @@ from models.models import (
     DocumentChunk,
     DocumentMetadataFilter,
     Query,
-    QueryResult,
+    QueryGroupResult,
     QueryWithEmbedding,
     SearchPrecision,
     DocumentDelete
@@ -38,7 +38,7 @@ class DataStore(ABC):
         return response or {"document_id": {}, "message": "Nothing processed."}
 
     
-    async def query(self, queries: List[Query]) -> List[QueryResult]:
+    async def query(self, queries: List[Query]) -> List[QueryGroupResult]:
         """
         Takes in a list of queries and filters and returns a list of query results with matching document chunks and scores.
         """
@@ -78,7 +78,41 @@ class DataStore(ABC):
             for i, r in enumerate(response):
                 r.results = truncate_results(r.results, 1, queries[i].searchprecision)
 
-        return response
+
+        def process_query_results(query_results):
+            grouped_results = []
+            
+            for query_result in query_results:
+                # Dictionary to hold the grouped results by document_id
+                document_groups = {}
+
+                for result in query_result.results:
+                    doc_id = result.metadata.document_id
+                    if doc_id not in document_groups:
+                        # Initialize a new group for this document_id
+                        document_groups[doc_id] = {
+                            "texts": [],
+                            "scores": [],
+                            "collection": result.collection,
+                            "partition": result.partition,
+                            "metadata": result.metadata,
+                            "embedding": result.embedding
+                        }
+
+                    # Append the text and score to the respective lists in the group
+                    document_groups[doc_id]["texts"].append(result.text)
+                    document_groups[doc_id]["scores"].append(result.score)
+
+                # Convert the grouped results into the desired list format
+                grouped_query_results = [value for key, value in document_groups.items()]
+                grouped_results.append({
+                    "query": query_result.query,
+                    "results": grouped_query_results
+                })
+
+            return grouped_results
+
+        return process_query_results(response)
 
     async def delete(
         self,

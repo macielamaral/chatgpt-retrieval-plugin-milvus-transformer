@@ -57,6 +57,14 @@ class DocumentMetadataFilter(BaseModel):
     document_id: Optional[str] = None
     authors: Optional[str] = None
 
+class DocumentGroupWithScores(BaseModel):
+    texts: List[str]  
+    collection: Optional[str] = None
+    partition: Optional[str] = None
+    metadata: Optional[DocumentMetadata] = None
+    embedding: Optional[List[float]] = None
+    scores: List[float]  
+    
 class Query(BaseModel):
     query: str
     collection: Optional[Collection] = None
@@ -75,4 +83,15 @@ class QueryResult(BaseModel):
 class DocumentDelete(BaseModel):
     document_id: str
     collection: Optional[Collection] = None
+
+class DocumentGroupWithScores(BaseModel):
+    texts: List[str]  
+    collection: Optional[str] = None
+    partition: Optional[str] = None
+    metadata: Optional[DocumentMetadata] = None
+    embedding: Optional[List[float]] = None
+    scores: List[float]  
     
+class QueryGroupResult(BaseModel):
+    query: str
+    results: List[DocumentGroupWithScores]

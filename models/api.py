@@ -2,7 +2,7 @@ from models.models import (
     Document,
     DocumentMetadataFilter,
     Query,
-    QueryResult,
+    QueryGroupResult,
     DocumentDelete
 )
 from pydantic import BaseModel
@@ -19,7 +19,7 @@ class QueryRequest(BaseModel):
     queries: List[Query]
 
 class QueryResponse(BaseModel):
-    results: List[QueryResult]
+    results: List[QueryGroupResult]
 
 class DeleteRequest(BaseModel):
     documents: List[DocumentDelete]

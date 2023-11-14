@@ -396,7 +396,8 @@ class MilvusDataStore(DataStore):
                 filter_expr = filter_expr if expressions else None
 
                 # Update the collection context
-                self._update_collection(query.collection or MILVUS_COLLECTION)
+                collection_name = query.collection or MILVUS_COLLECTION
+                self._update_collection(collection_name)
                 
                 # set partition
                 partition_names = None
@@ -467,6 +468,7 @@ class MilvusDataStore(DataStore):
                     chunk = DocumentChunkWithScore(
                         id=doc_id,
                         text=contents,
+                        collection=collection_name,
                         partition=query.partition or None,
                         metadata=DocumentChunkMetadata(**metadata),
                         score=score,
