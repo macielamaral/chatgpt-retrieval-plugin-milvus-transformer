@@ -3,7 +3,9 @@ from models.models import (
     DocumentMetadataFilter,
     Query,
     QueryGroupResult,
-    DocumentDelete
+    DocumentDelete,
+    Partition,
+    Collection
 )
 from pydantic import BaseModel
 from typing import List, Dict, Any
@@ -26,4 +28,11 @@ class DeleteRequest(BaseModel):
 
 class DeleteResponse(BaseModel):
     success: bool
-    
+
+class SaveURLDocumentRequest(BaseModel):
+    documents_url: List[str]
+    collection: Collection
+    partition: Partition
+
+class SaveURLDocumentResponse(BaseModel):
+    results: str

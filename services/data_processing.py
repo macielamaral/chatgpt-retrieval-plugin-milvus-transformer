@@ -22,14 +22,10 @@ from typing import List
 import numpy as np
 import pandas as pd
 from datetime import datetime
+from urllib.parse import urlparse
+import requests
 
-from pymilvus import (
-    connections,
-    utility,
-    FieldSchema, CollectionSchema, DataType,
-    Collection,
-)
-from models.models import Document, DocumentChunk, DocumentChunkMetadata, Partition, SearchPrecision
+from models.models import Document, DocumentChunk, DocumentChunkMetadata, Partition, Collection
 from typing import Dict, List, Optional, Tuple
 # The powerfull transformers models
 from sentence_transformers import SentenceTransformer
@@ -265,4 +261,62 @@ def load_processed_files(filename):
     except FileNotFoundError:
         return []
     
+class UnsupportedFileTypeError(Exception):
+    """Exception raised for unsupported file types."""
+    def __init__(self, message="Unsupported file type"):
+        self.message = message
+        super().__init__(self.message)
+
+class UnsupportedPartitionError(Exception):
+    """Exception raised for unsupported Partition."""
+    def __init__(self, message="Unsupported Partition for the database"):
+        self.message = message
+        super().__init__(self.message)
+
+class UnsupportedCollectionError(Exception):
+    """Exception raised for unsupported Collection."""
+    def __init__(self, message="Unsupported Collection for the database"):
+        self.message = message
+        super().__init__(self.message)        
+
+def process_and_upload_documents_url(documents_url, collection, partition):
+    errors = []
+    if collection not in Collection.__members__:
+        raise UnsupportedCollectionError("Unsupported Collection: " + str(collection))
     
+    if partition not in Partition.__members__:
+        raise UnsupportedPartitionError("Unsupported Partition: " + str(partition))
+    
+    for document_url in documents_url:
+        try:
+            file_extension = os.path.splitext(document_url)[1].lower()
+            if file_extension not in {'.pdf', '.tex', '.txt'}:
+                raise UnsupportedFileTypeError("Unsupported file type: " + file_extension)
+
+            input_dir = os.path.join("./data", collection)
+            input_dir = os.path.join(input_dir, partition)
+            os.makedirs(input_dir, exist_ok=True)
+
+            # Download the file
+            response = requests.get(document_url)
+            response.raise_for_status()
+
+            filename = os.path.basename(urlparse(document_url).path)
+            file_path = os.path.join(input_dir, filename)
+
+            with open(file_path, 'wb') as f:
+                f.write(response.content)
+
+            # Add logic to process and upload the file
+
+        except requests.RequestException as e:
+            errors.append(f"Error downloading {document_url}: {e}")
+        except UnsupportedFileTypeError as e:
+            errors.append(f"Error: {e}")
+        except Exception as e:
+            errors.append(f"An error occurred: {e}")
+    
+    if errors:
+        raise Exception("Errors occurred during processing: " + "; ".join(errors))
+
+    return "Documents scheduled to upload successfully"

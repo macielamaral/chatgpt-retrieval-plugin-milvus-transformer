@@ -95,3 +95,5 @@ class DocumentGroupWithScores(BaseModel):
 class QueryGroupResult(BaseModel):
     query: str
     results: List[DocumentGroupWithScores]
+
+    

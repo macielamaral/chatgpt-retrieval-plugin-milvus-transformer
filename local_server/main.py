@@ -1,6 +1,5 @@
 # This is a version of the main.py file found in ../../../server/main.py for testing the plugin locally.
 # Use the command `poetry run dev` to run this.
-from typing import Optional
 import uvicorn
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,13 +12,16 @@ from models.api import (
     UpsertRequest,
     UpsertResponse,
     DeleteRequest,
-    DeleteResponse
+    DeleteResponse,
+    SaveURLDocumentResponse,
+    SaveURLDocumentRequest
 )
 from datastore.factory import get_datastore
 
 from starlette.responses import FileResponse
 
-from models.models import DocumentMetadata
+from services.data_processing import process_and_upload_documents_url
+
 
 app = FastAPI()
 
@@ -114,6 +116,20 @@ async def delete(
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
+
+
+@app.post(
+    "/upload_from_url", 
+    response_model=SaveURLDocumentResponse
+    )
+async def upload_from_url(
+    request: SaveURLDocumentRequest
+    ):
+    try:
+        result = process_and_upload_documents_url(request.documents_url, request.collection, request.partition)
+        return SaveURLDocumentResponse(results=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.on_event("startup")

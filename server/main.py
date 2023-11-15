@@ -1,22 +1,23 @@
 import os
-from typing import Optional
 import uvicorn
-from fastapi import FastAPI, File, Form, HTTPException, Depends, Body, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Depends, Body
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
 from models.api import (
-    DeleteRequest,
-    DeleteResponse,
     QueryRequest,
     QueryResponse,
     UpsertRequest,
     UpsertResponse,
+    DeleteRequest,
+    DeleteResponse,
+    SaveURLDocumentResponse,
+    SaveURLDocumentRequest
 )
 from datastore.factory import get_datastore
 
-from models.models import DocumentMetadata
+from services.data_processing import process_and_upload_documents_url
 
 bearer_scheme = HTTPBearer()
 BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
@@ -37,7 +38,7 @@ sub_app = FastAPI(
     title="Retrieval Plugin API",
     description="A retrieval API for querying and filtering documents based on natural language queries and metadata",
     version="1.0.0",
-    servers=[{"url": "https://qgr-retrieval-plugin-server.onrender.com"}],
+    servers=[{"url": "https://gpt.marcelomacielamaral.com"}],
     dependencies=[Depends(validate_token)],
 )
 app.mount("/sub", sub_app)
@@ -90,6 +91,20 @@ async def delete(
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
+
+
+@app.post(
+    "/upload_from_url", 
+    response_model=SaveURLDocumentResponse
+    )
+async def upload_from_url(
+    request: SaveURLDocumentRequest
+    ):
+    try:
+        result = process_and_upload_documents_url(request.documents_url, request.collection, request.partition)
+        return SaveURLDocumentResponse(results=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.on_event("startup")

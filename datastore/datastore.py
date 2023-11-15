@@ -14,8 +14,7 @@ from models.models import (
     DocumentDelete
 )
 
-from services.data_processing import get_embeddings
-from services.data_processing import get_document_chunks
+from services.data_processing import get_embeddings, get_document_chunks
 
 
 #default values
