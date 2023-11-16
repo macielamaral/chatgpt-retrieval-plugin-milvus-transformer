@@ -53,17 +53,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /delete/{document_ids}:
-    delete:
+  /delete:
+    post:
       summary: Delete
-      operationId: delete_delete__document_ids__delete
-      parameters:
-        - required: true
-          schema:
-            title: Document Ids
-            type: string
-          name: document_ids
-          in: path
+      operationId: delete_delete_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+        required: true
       responses:
         '200':
           description: Successful Response
@@ -77,8 +76,72 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /upload_from_url:
+    post:
+      summary: Upload From Url
+      operationId: upload_from_url_upload_from_url_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveURLDocumentRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaveURLDocumentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /document/{document_id}:
+    get:
+      summary: Get Document
+      operationId: get_document_document__document_id__get
+      parameters:
+        - required: true
+          schema:
+            title: Document Id
+            type: string
+          name: document_id
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    Collection:
+      title: Collection
+      enum:
+        - collection1
+        - collection2
+      type: string
+      description: An enumeration.
+    DeleteRequest:
+      title: DeleteRequest
+      required:
+        - documents
+      type: object
+      properties:
+        documents:
+          title: Documents
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentDelete'
     DeleteResponse:
       title: DeleteResponse
       required:
@@ -97,60 +160,56 @@ components:
         text:
           title: Text
           type: string
+        collection:
+          $ref: '#/components/schemas/Collection'
         partition:
           $ref: '#/components/schemas/Partition'
         metadata:
           $ref: '#/components/schemas/DocumentMetadata'
-    DocumentChunkMetadata:
-      title: DocumentChunkMetadata
+    DocumentDelete:
+      title: DocumentDelete
+      required:
+        - document_id
       type: object
       properties:
-        created_at:
-          title: Created At
-          type: string
-        authors:
-          title: Authors
-          type: string
-        title:
-          title: Title
-          type: string
-        abstract:
-          title: Abstract
-          type: string
-        keywords:
-          title: Keywords
-          type: string
-        category:
-          title: Category
-          type: string
         document_id:
           title: Document Id
           type: string
-    DocumentChunkWithScore:
-      title: DocumentChunkWithScore
+        collection:
+          $ref: '#/components/schemas/Collection'
+    DocumentGroupWithScores:
+      title: DocumentGroupWithScores
       required:
-        - text
-        - score
+        - texts
+        - scores
       type: object
       properties:
-        id:
-          title: Id
+        texts:
+          title: Texts
+          type: array
+          items:
+            type: string
+        document_id:
+          title: Document Id
           type: string
-        text:
-          title: Text
+        collection:
+          title: Collection
           type: string
         partition:
-          $ref: '#/components/schemas/Partition'
+          title: Partition
+          type: string
         metadata:
-          $ref: '#/components/schemas/DocumentChunkMetadata'
+          $ref: '#/components/schemas/DocumentMetadata'
         embedding:
           title: Embedding
           type: array
           items:
             type: number
-        score:
-          title: Score
-          type: number
+        scores:
+          title: Scores
+          type: array
+          items:
+            type: number
     DocumentMetadata:
       title: DocumentMetadata
       type: object
@@ -201,6 +260,8 @@ components:
         - notes
         - books
         - others
+        - emails
+        - codes
       type: string
       description: An enumeration.
     Query:
@@ -212,6 +273,10 @@ components:
         query:
           title: Query
           type: string
+        collection:
+          $ref: '#/components/schemas/Collection'
+        partition:
+          $ref: '#/components/schemas/Partition'
         filter:
           $ref: '#/components/schemas/DocumentMetadataFilter'
         top_k:
@@ -220,8 +285,21 @@ components:
           default: 5
         searchprecision:
           $ref: '#/components/schemas/SearchPrecision'
-        partition:
-          $ref: '#/components/schemas/Partition'
+    QueryGroupResult:
+      title: QueryGroupResult
+      required:
+        - query
+        - results
+      type: object
+      properties:
+        query:
+          title: Query
+          type: string
+        results:
+          title: Results
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentGroupWithScores'
     QueryRequest:
       title: QueryRequest
       required:
@@ -243,22 +321,33 @@ components:
           title: Results
           type: array
           items:
-            $ref: '#/components/schemas/QueryResult'
-    QueryResult:
-      title: QueryResult
+            $ref: '#/components/schemas/QueryGroupResult'
+    SaveURLDocumentRequest:
+      title: SaveURLDocumentRequest
       required:
-        - query
+        - documents_url
+        - collection
+        - partition
+      type: object
+      properties:
+        documents_url:
+          title: Documents Url
+          type: array
+          items:
+            type: string
+        collection:
+          $ref: '#/components/schemas/Collection'
+        partition:
+          $ref: '#/components/schemas/Partition'
+    SaveURLDocumentResponse:
+      title: SaveURLDocumentResponse
+      required:
         - results
       type: object
       properties:
-        query:
-          title: Query
-          type: string
         results:
           title: Results
-          type: array
-          items:
-            $ref: '#/components/schemas/DocumentChunkWithScore'
+          type: string
     SearchPrecision:
       title: SearchPrecision
       enum:

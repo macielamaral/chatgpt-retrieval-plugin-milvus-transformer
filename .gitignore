@@ -161,3 +161,6 @@ cython_debug/
 
 # Data folder
 data/
+scripts/data_input/
+scripts/process_json/new_2023/
+scripts/grobid_output/

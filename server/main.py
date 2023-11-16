@@ -76,7 +76,7 @@ async def query_main(request: QueryRequest = Body(...)):
 
 
 
-@app.delete(
+@app.post(
     "/delete",
     response_model=DeleteResponse,
 )

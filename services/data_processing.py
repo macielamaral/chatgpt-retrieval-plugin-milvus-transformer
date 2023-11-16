@@ -130,11 +130,12 @@ def process_file_from_folder(folder_path):
                 with open(file_path, 'r') as json_file:
                     data = json.load(json_file)
                     entry = {
-                        "title": data.get("title"),
-                        "date": data.get("date"),
-                        "authors": ", ".join(data.get("authors", [])),
+                        "title": data.get("title", "Unknown"),
+                        "date": data.get("date", "Unknown"),
+                        "authors": ", ".join(data.get("authors", [])) if isinstance(data.get("authors"), list) else "Unknown",
+                        "autkeywordshors": ", ".join(data.get("keywords", [])) if isinstance(data.get("keywords"), list) else "Unknown",
                         "abstract": data.get("abstract"),
-                        "content": data.get("latex_doc"),
+                        "latex_doc": data.get("latex_doc"),
                         "category": category
                     }
                 return entry, file_path

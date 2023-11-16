@@ -172,46 +172,32 @@ def main(input_path_or_url):
 
 
 def text_to_json(input_file, dir_destination_path):
-    # Read the plain text content from the input file
-    with open(input_file, 'r') as f:
-        text_content = f.read()
-    
-    # Initialize the JSON object
-    json_data = {}
-    
-    # Use the file name as the title
-    json_data['title'] = os.path.splitext(os.path.basename(input_file))[0]
-    
-    # Use the current date as the date
-    json_data['date'] = datetime.now().strftime('%Y-%m-%d')
-    
-    # Assume authors list is empty (since we don't have this metadata in plain text)
-    json_data['authors'] = []
-    
-    # Assume the first paragraph is the abstract
-    paragraphs = text_content.split('\n\n', 1)
-    if paragraphs:
-        json_data['abstract'] = paragraphs[0].strip()
-    
-    # Limit the abstract to 1000 characters
-    json_data['abstract'] = json_data['abstract'][:1000]
+    try:
+        with open(input_file, 'r', encoding='utf-8') as f:
+            text_content = f.read()
 
-    # Include the whole text document, ensuring we escape any characters that need it
-    json_data['latex_doc'] = text_content
+        json_data = {
+            'title': os.path.splitext(os.path.basename(input_file))[0],
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'authors': [],  # No authors metadata
+            'abstract': text_content[:1000],  # Limit the abstract
+            'category': 'Unknown',  # Default category
+            'keywords': [],  # No keywords metadata
+            'latex_doc': text_content  # Full text content
+        }
 
-    # Create the destination directory if it doesn't exist
-    if not os.path.exists(dir_destination_path):
-        os.makedirs(dir_destination_path)
-    
-    # Generate the JSON file name based on the input text file name
-    json_file_name = os.path.splitext(os.path.basename(input_file))[0] + '.json'
-    json_file_path = os.path.join(dir_destination_path, json_file_name)
-    
-    # Save the JSON data to the destination directory
-    with open(json_file_path, 'w') as f:
-        json.dump(json_data, f, indent=4)
-    
-    return json_file_path
+        os.makedirs(dir_destination_path, exist_ok=True)
+        json_file_name = os.path.splitext(os.path.basename(input_file))[0] + '.json'
+        json_file_path = os.path.join(dir_destination_path, json_file_name)
+
+        with open(json_file_path, 'w', encoding='utf-8') as f:
+            json.dump(json_data, f, indent=4)
+
+        return json_file_path
+
+    except Exception as e:
+        print(f"Error processing {input_file}: {e}")
+        return None
 
 
 def email_to_json(input_path_or_url):

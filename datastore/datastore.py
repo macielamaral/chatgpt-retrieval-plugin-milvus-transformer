@@ -127,12 +127,13 @@ class DataStore(ABC):
     async def raw_upsert(
             self,
             document: List[List[Any]],
+            collection_name: str,
             partition_name: str
         ) -> Any:  
         """
         Insert data
         """
-        return await self._raw_upsert(document, partition_name)
+        return await self._raw_upsert(document, collection_name, partition_name)
     
     async def flush(
             self
