@@ -1,6 +1,6 @@
 import os
 import uvicorn
-from fastapi import FastAPI, File, Form, HTTPException, Depends, Body
+from fastapi import FastAPI, HTTPException, Depends, Body
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
@@ -17,7 +17,7 @@ from models.api import (
 )
 from datastore.factory import get_datastore
 
-from services.data_processing import process_and_upload_documents_url
+from services.data_processing import process_and_upload_documents_url, get_document_content
 
 bearer_scheme = HTTPBearer()
 BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
@@ -107,6 +107,20 @@ async def upload_from_url(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get(
+    "/document/{document_id}"
+    )
+async def get_document(
+    document_id: str
+    ):
+    try:
+        content = get_document_content(document_id)
+        return content
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Document not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @app.on_event("startup")
 async def startup():
     global datastore
@@ -114,4 +128,4 @@ async def startup():
 
 
 def start():
-    uvicorn.run("server.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("server.main:app", host="0.0.0.0", port=8000, reload=False)

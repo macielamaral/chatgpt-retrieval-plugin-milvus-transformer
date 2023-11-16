@@ -27,11 +27,21 @@ import requests
 
 from models.models import Document, DocumentChunk, DocumentChunkMetadata, Partition, Collection
 from typing import Dict, List, Optional, Tuple
+
+
+
 # The powerfull transformers models
 from sentence_transformers import SentenceTransformer
 
+#tokenize
+from transformers import GPT2Tokenizer
+
+# Initialize the tokenizer
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+
 #Text splitter
 from langchain.text_splitter import LatexTextSplitter
+
 
 # Load the pre-trained SBERT model once
 sbert_model = SentenceTransformer('sentence-transformers/multi-qa-MiniLM-L6-cos-v1') 
@@ -40,6 +50,7 @@ sbert_model = SentenceTransformer('sentence-transformers/multi-qa-MiniLM-L6-cos-
 MILVUS_COLLECTION = os.environ.get("MILVUS_COLLECTION") #Default Collection
 CATEGORY = "ChatGPT"
 PARTITION = "chats"
+MAX_TOKEN_COUNT = 2000  # Set your maximum token count based on your GPT model's limitatio
 
 #using sentence level embedding
 def get_embeddings(texts: List[str]) -> List[List[float]]:
@@ -288,6 +299,11 @@ def process_and_upload_documents_url(documents_url, collection, partition):
         raise UnsupportedPartitionError("Unsupported Partition: " + str(partition))
     
     for document_url in documents_url:
+        parsed_url = urlparse(document_url)
+        if not parsed_url.scheme in ['http', 'https']:
+            raise ValueError("Invalid URL scheme")
+        if not parsed_url.netloc:
+            raise ValueError("Invalid URL")
         try:
             file_extension = os.path.splitext(document_url)[1].lower()
             if file_extension not in {'.pdf', '.tex', '.txt'}:
@@ -320,3 +336,36 @@ def process_and_upload_documents_url(documents_url, collection, partition):
         raise Exception("Errors occurred during processing: " + "; ".join(errors))
 
     return "Documents scheduled to upload successfully"
+
+
+def get_document_content(document_id: str) -> dict:
+    """
+    Retrieves the content of a document based on its document_id.
+
+    :param document_id: The unique identifier of the document.
+    :return: A dictionary containing the document_id and its content.
+    :raises FileNotFoundError: If the document does not exist.
+    """
+    # Validate that the document_id does not contain path traversal characters
+    if '..' in document_id or '/' in document_id or '\\' in document_id:
+        raise ValueError("Invalid document_id")
+
+    document_path = f"./data/json_source/{document_id}.json"
+    if not os.path.exists(document_path):
+        raise FileNotFoundError(f"Document with ID {document_id} not found")
+
+    with open(document_path, 'r') as file:
+        document_content = json.load(file)
+    
+    # Ensure the content is in string format if it's JSON
+    document_text = json.dumps(document_content) if isinstance(document_content, dict) else document_content
+
+    # Tokenize and count the tokens
+    tokens = tokenizer.encode(document_text)
+    token_count = len(tokens)
+    
+    if token_count > MAX_TOKEN_COUNT:
+        raise ValueError("Document size exceeds the maximum token limit supported")
+
+
+    return {"document_id": document_id, "content": document_content}

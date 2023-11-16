@@ -86,6 +86,7 @@ class DocumentDelete(BaseModel):
 
 class DocumentGroupWithScores(BaseModel):
     texts: List[str]  
+    document_id: Optional[str] = None
     collection: Optional[str] = None
     partition: Optional[str] = None
     metadata: Optional[DocumentMetadata] = None

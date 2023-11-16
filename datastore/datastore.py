@@ -91,6 +91,7 @@ class DataStore(ABC):
                         # Initialize a new group for this document_id
                         document_groups[doc_id] = {
                             "texts": [],
+                            "document_id": doc_id,
                             "scores": [],
                             "collection": result.collection,
                             "partition": result.partition,

@@ -3,6 +3,7 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
 
 from loguru import logger
 
@@ -20,7 +21,7 @@ from datastore.factory import get_datastore
 
 from starlette.responses import FileResponse
 
-from services.data_processing import process_and_upload_documents_url
+from services.data_processing import process_and_upload_documents_url, get_document_content
 
 
 app = FastAPI()
@@ -132,6 +133,21 @@ async def upload_from_url(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+@app.get(
+    "/document/{document_id}"
+    )
+async def get_document(
+    document_id: str
+    ):
+    try:
+        content = get_document_content(document_id)
+        return content
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Document not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @app.on_event("startup")
 async def startup():
     global datastore
