@@ -15,7 +15,32 @@ from datastore.factory import get_datastore
 import asyncio
 
 
+def save_document_as_json(document_id, document_content, base_folder="../../data/json_source"):
+    """
+    Save the document content as a JSON file named with the document_id.
+    """
+    
+    # Ensure the base directory exists
+    os.makedirs(base_folder, exist_ok=True)
 
+    file_path = os.path.join(base_folder, f"{document_id}.json")
+
+    try:
+        # Attempt to save as JSON
+        with open(file_path, 'w', encoding='utf-8') as json_file:
+            json.dump(document_content, json_file, ensure_ascii=False, indent=4)
+    except TypeError as e:
+        print(f"Error saving document {document_id}: {e}")
+        # Handle or log the error appropriately
+
+def stringify_authors_or_keywords(value):
+    if isinstance(value, list):
+        return ', '.join(value)
+    elif isinstance(value, str):
+        return value
+    else:
+        return "Unknown"
+    
 async def insert_data_json_into_milvus(
         collection_name,
         partition_name,
@@ -45,19 +70,21 @@ async def insert_data_json_into_milvus(
 
         if entry is None:
             break
-
+        
         try:
             date_value = entry.get("date", "") or "Unknown"  # Use "Unknown" if date is None or empty
             if len(date_value) > 1000:
                 date_value = qgr.clean_description(date_value)
             date_value = date_value[:250]  # Truncate to 256 characters
 
-            keywords_value = entry.get("keywords", "") or "Unknown"  # Use "Unknown" if keywords is None or empty
+            keywords = entry.get("keywords", "") or "Unknown"  # Use "Unknown" if keywords is None or empty
+            keywords_value = stringify_authors_or_keywords(keywords)[:1004]
             if len(keywords_value) > 1000:
                 keywords_value = qgr.clean_description(keywords_value)
             keywords_value = keywords_value[:1004]  # Truncate to 1024 characters
             
-            author_value = entry.get("authors", "") or "Unknown"
+            authors = entry.get("authors", "") or "Unknown" 
+            author_value = stringify_authors_or_keywords(authors)[:1000]
             if len(author_value) > 1000:
                 author_value = qgr.clean_description(author_value)
             author_value = author_value[:1000]  # Truncate to 1024 characters
@@ -77,15 +104,19 @@ async def insert_data_json_into_milvus(
                 category_value = qgr.clean_description(category_value)
             category_value = category_value[:250]  # Truncate to 256 characters
             
-            content = entry["content"]
+            content = entry.get("latex_doc", "")
             
             if partition_name == "notes":
                 content = qgr.clean_description(content)
             else:
                 content = qgr.clean_latex(content)
-            docslatex = qgr.splitText(content, LatexTextSplitter, 512)            
             
+            docslatex = qgr.splitText(content, LatexTextSplitter, 512)            
+    
             documentId_value = qgr.generate_document_id(title_value, author_value, date_value)
+
+            # Save the document as a JSON file
+            save_document_as_json(documentId_value, entry, base_folder="../../data/json_source")
 
             for chunk in docslatex:
                 if len(chunk.page_content) > 512:
@@ -108,7 +139,7 @@ async def insert_data_json_into_milvus(
                 ]
                 #insert data
                 #To Do: use different collection_name, currently set global a default
-                insert_result = await datastore.raw_upsert(doc, partition_name)
+                insert_result = await datastore.raw_upsert(doc, collection_name, partition_name)
                 
                 if not insert_result:
                     title = entry.get("title", "")
