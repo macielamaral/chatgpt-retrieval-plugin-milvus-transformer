@@ -197,10 +197,10 @@ def main(input_path_or_url, folder_output):
 
 def text_to_json(input_file, dir_destination_path):
     #adding manually some metadata
-    authors = "Klee Irwin"
-    category = "Klee_Presentations"
-    keywords = "Presentations"
-    optionalabstractdescription = "This is from a collectio of Klee's presentations: "
+    authors = "QGR team"
+    category = "General"
+    keywords = "QGR"
+    optionalabstractdescription = "Imported from txt: "
     try:
         with open(input_file, 'r', encoding='utf-8') as f:
             text_content = f.read()
