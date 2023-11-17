@@ -4,8 +4,8 @@ from enum import Enum
 from pydantic import validator
 
 class Collection(str, Enum):
-    collection1 = "collection1"
-    collection2 = "collection2"
+    QGRMemory = "QGRMemory"
+    KleeMemory = "KleeMemory"
 
 class Partition(str, Enum):
     chats = "chats"

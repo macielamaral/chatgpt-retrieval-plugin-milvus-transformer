@@ -164,3 +164,4 @@ data/
 scripts/data_input/
 scripts/process_json/new_2023/
 scripts/grobid_output/
+scripts/process_json/partitions/

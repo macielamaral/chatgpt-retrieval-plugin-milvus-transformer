@@ -113,6 +113,11 @@ def splitText(content, splitter, length, overlap=20):
 
 
 def process_file_from_folder(folder_path):
+    if os.path.exists(folder_path) and os.access(folder_path, os.R_OK):
+        pass
+    else:
+        print("Directory does not exist or is not readable")
+
     for root, dirs, files in os.walk(folder_path):
         # Get the relative path from the root folder to the current directory
         rel_path = os.path.relpath(root, folder_path)
